@@ -1,0 +1,30 @@
+---
+  - name: Configurando Docker Swarm
+    hosts: linux_server
+
+    roles:
+      - docker
+      - swarm
+  
+  - name: Criando Imagem
+    hosts: linux_server
+    vars_prompt:
+      - name: db_ip
+        prompt: "mysql ip"
+        private: no
+      - name: db_name
+        prompt: "mysql database name"
+        private: no    
+      - name: db_user
+        prompt: "mysql user"
+        private: no
+      - name: db_password
+        prompt: "mysql password"
+        private: yes
+      - name: db_value
+        prompt: "filme name to insert"
+        private: no
+
+    roles:
+      - build
+      - service          

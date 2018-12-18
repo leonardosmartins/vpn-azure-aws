@@ -1,0 +1,6 @@
+---
+  - name: Criando Imagem
+    docker_image:
+      path: /home/ubuntu/mysql-vpn
+      name: mysql-vpn
+    become: yes

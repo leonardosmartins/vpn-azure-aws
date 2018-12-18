@@ -4,26 +4,26 @@
 
 ## Descrição do ambiente de demonstração
 
- Para o ambiente de demonstração iremos construir um cenário onde instalaremos e configuraremos uma instância MySQL em uma das VMs. Nessa instância do MySQL criaremos um Database e um usuário com permissões completas nesse Database criado. Em seguida será criado uma tabela "filme" com um campo FILME_ID e outro campo FILME_NAME.
+ Para o ambiente de demonstração iremos construir um cenário onde instalaremos e configuraremos uma instância MySQL em uma das VMs. Nessa instância do MySQL criaremos um Database e um usuário com permissões completas nesse Database criado. Em seguida será criado uma tabela `filme` com um campo `FILME_ID` e outro campo `FILME_NAME`.
  
- Na outra VM, com a utilização de um script ansible, iremos instalar a ferramnte Docker e iniciaremos um ambiente de Docker Swarm. Por fim criaremos uma imagem docker a partir do Dockerfile presente neste repositório que irá conter a aplicação conn.go, também presente neste repositório, a qual inicia uma conexão com o banco MySQL e insere um valor, passado pelo script ansible, na tabela filme criada no nosso MySQL.  
+ Na outra VM, com a utilização de um script ansible, iremos instalar a ferramnte Docker e iniciaremos um ambiente de Docker Swarm. Por fim criaremos uma imagem docker a partir do `Dockerfile` presente neste repositório que irá conter a aplicação `connection.go`, também presente neste repositório, a qual inicia uma conexão com o banco MySQL e insere um valor, passado pelo script ansible, na tabela `filme` criada no nosso MySQL.  
  
 # VPN
 
 Para realizar a comunicação entre a VM hospedada na AWS com a VM hospedada na Azure, estabeleceremos uma conexão VPN utilizando uma ferramenta chamada Strongswan.
 
-#### Configurando Ambiente
+### Configurando Ambiente
 
 Primeiro vamos listar uma sequência de recursos que devem ser criados e configurados inicialmente em cada uma das nuvens
 
-##### Azure
+#### Azure
 
  - Criar Resource Group
  - Criar Virtual Network
  - Criar Virtual Machine (Ubuntu)
  - Liberar portas 500 e 4500 com protocolo UDP na Virtual Machine criada
 
-##### AWS
+#### AWS
 
  - Criar VPC
  - Criar Subnet
@@ -38,7 +38,9 @@ Primeiro vamos listar uma sequência de recursos que devem ser criados e configu
  - Criar Elastic IP
  - Associar Elastic IP na EC2 criada
 
-#### Instalando e configurando Strongswan
+### Instalando e configurando Strongswan
+
+Essas configurações devem ser feitas nas duas VMs, utilizando a informações adequadas em cada VM.
 
 Atualizando pacotes:
 ```sh
@@ -50,22 +52,22 @@ Instalando Strongswan:
 $ sudo apt-get install strongswan
 ```
 
-Editar o arquivo ipsec.conf e adicionar conn. Usar template conn-template preenchendo dados necessários:
+Editar o arquivo `ipsec.conf`. Usar template `ipsec-template.conf` preenchendo os dados necessários:
 ```sh
 $ sudo nano /etc/ipsec.conf
 ```
 
-Editar o arquivo ipsec.secrets e adicionar uma chave para conexão. Usar template secrets-template preenchendo dados necessários:
+Editar o arquivo `ipsec.secrets`. Usar template `ipsec-template.secrets` preenchendo os dados necessários:
 ```sh
 $ sudo nano /etc/ipsec.secrets
 ```
 
-Editar o arquivo sysctl.conf e descomentar a linha net.ipv4.ip_forward = 1:
+Editar o arquivo `sysctl.conf` e descomentar a linha `net.ipv4.ip_forward = 1`:
 ```sh
 $ sudo nano /etc/sysctl.conf
 ```
 
-First Tab:
+Habilitando alterações realizadas:
 ```sh
 $ sudo sysctl -p /etc/sysctl.conf
 ```
@@ -79,6 +81,7 @@ Verificando conexão estabelecida:
 ```sh
 $ sudo ipsec status
 ```
+
 # MySQL
 
 Com a nossa VPN já estabelecida, vamos instalar e configurar uma instância MySQL e uma das VMs.
@@ -100,7 +103,7 @@ Liberando acesso remoto:
 $ sudo ufw allow mysql
 ```
 
-Editar o arquivo mysqld.cnf e comentar a linha "bind"  :
+Editar o arquivo `mysqld.cnf` e comentar a linha `bind-address = 127.0.0.1`  :
 ```sh
 $ sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
 ```
@@ -109,6 +112,7 @@ Reiniciando MySQL:
 ```sh
 $ sudo /etc/init.d/mysql restart
 ```
+
 #### Criando ambiente de demonstração
 
 Conectando como root:
@@ -143,13 +147,14 @@ mysql> USE projeto;
 
 Criando tabela filme:
 ```sh
-mysql> CREATE TABLE filme (filme_id INT NOT NULL AUTO_INCREMENT, filme_name VARCHAR(50 NOT NULL, PRIMARY KEY (filme_id));
+mysql> CREATE TABLE filme (filme_id INT NOT NULL AUTO_INCREMENT, filme_name VARCHAR(50) NOT NULL, PRIMARY KEY (filme_id));
 ```
+
 # Ansible
 
 Utilizaremos a ferramenta Ansible para a automatização da configuração do nosso ambiente de Docker Swarm e o deploy da aplicação que acessará o MySQL que criamos.
 
-Antes de rodarmos nosso script ansible, deve-se primeiro preencher com as informações necessárias o arquivo ansible/hosts
+Antes de rodarmos nosso script ansible, deve-se primeiro preencher com as informações necessárias no arquivo ansible/hosts
 
 Deve-se também antes de executar o script ansible conectar na VM na qual configuraremos esse ambiente, e instalar alguns pacotes:
 
@@ -163,7 +168,7 @@ Instalando docker-py:
 $ sudo pip install docker-py
 ```
 
-Por fim deve-se colocar o con.go e o Dockerfile dentro dessa VM
+Por fim deve-se colocar o connection.go e o Dockerfile dentro dessa VM no diretório `/home/ubuntu/mysql-vpn`
 
 Executando nosso ansible:
 ```sh
@@ -172,11 +177,12 @@ $ ansible-playbook -i hosts main.yml
 
 Quando solicitado deve-se informar as seguintes informações:
  - db_ip = ip_privado_mysql
+ - db_name = database_name
  - db_user = usuário_criado_mysql
  - db_password = password_criado_mysql
  - value = valor desejado para inserir como filme_name
 
-# Testando
+# Validação
 
 Para verificar todo nosso processo, basta entrar na VM com o MySQL, conectar ao MySQL e rodar os seguintes comando:
 

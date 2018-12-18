@@ -1,0 +1,10 @@
+---
+  - name: Verificando se o Docker Swarm está habilitado
+    shell: docker info
+    changed_when: False
+    register: docker_info
+    become: yes
+
+  - name: Criando o cluster
+    shell: docker swarm init
+    become: yes

@@ -1,0 +1,4 @@
+---
+  - name: Criando serviço
+    shell: docker service create --name mysql-vpn -e DB_NAME={{ db_name }} -e DB_USER={{ db_user }} -e DB_PASSWORD={{ db_password }} -e DB_IP={{ db_ip }} -e VALUE={{ db_value }} mysql-vpn
+    become: yes
