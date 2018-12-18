@@ -1,4 +1,4 @@
-# VPN-AWS-AZURE
+# VPN-AZURE-AWS
  
  Este projeto tem a finalidade de demonstrar como criar uma VPN entre uma VM hospedada na AWS com outra VM hospedada na Azure e criar um ambiente de demonstração de funcionamento dessa comunicação.
 
