@@ -86,7 +86,7 @@ $ sudo ipsec status
 
 Com a nossa VPN já estabelecida, vamos instalar e configurar uma instância MySQL e uma das VMs.
 
-#### Instalando e configurando
+### Instalando e configurando
 
 Instalando MySQL:
 ```sh
@@ -113,7 +113,7 @@ Reiniciando MySQL:
 $ sudo /etc/init.d/mysql restart
 ```
 
-#### Criando ambiente de demonstração
+### Criando ambiente de demonstração
 
 Conectando como root:
 ```sh
